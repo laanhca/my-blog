@@ -67,17 +67,14 @@ const config = {
             type: 'doc',
             docId: 'intro',
             position: 'left',
-            label: 'Noted',
+            label: 'Notes',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
-       
+          { to: '/blog', label: 'Blog', position: 'left' }
         ],
       },
       footer: {
         style: 'dark',
-        links: [
-
-        ],
+        links: [],
         copyright: `Copyright © ${new Date().getFullYear()} Anh Van. Make with Love.`,
       },
       prism: {
