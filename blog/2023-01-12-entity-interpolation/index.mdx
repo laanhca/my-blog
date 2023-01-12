@@ -1,0 +1,37 @@
+---
+slug: entity-interpolation
+title: Nội suy thực thể
+authors: [anh]
+tags: [multiplayer, sync entity, game dev, interpolation]
+---
+
+Giải quyết một vấn đề mình gặp phải trong quá trình học làm mutiplayer.
+
+# Vấn đề
+
+Khác với game offline một người chơi, multiplayer cần hiển thị cả những người chơi khác trên bản đồ. Cơ chế đại loại như thế này: <br />
+
+- Client (người chơi) sẽ gửi vị trí của mình đến Server mỗi khi người chơi di chuyển.
+- Server dùng vị trí này để Validate (chống gian lận), đồng thời cung cấp thông tin cho những người chơi khác.
+- Client khác sẽ lấy dữ liệu vị trí từ Server để hiển thị lên máy của mình.
+
+Ban đầu mình sử dùng một hàm kiểu như này:
+
+```cs title="SyncViewWithServer()"
+Vector3 targetPos = state.position; // get last position from server
+var step =  speed * Time.deltaTime; // calculate distance to move per frame
+transform.position = Vector3.MoveTowards(transform.position, targetPos, step);
+```
+
+Dùng hàm MoveTowards mục đích để di chuyển mượt mà từ vị trí hiện tại đến vị trí lấy được từ server (Có thể dùng hàm Lerp hoặc SmoothDamp).
+Thực tế nó lại không như mình tưởng tượng, nhân vật di chuyển giật tung cmn chảo bên client khác.
+
+![lag](./move_lag.gif)
+
+Nguyên nhân là do đâu:
+
+# Giải pháp
+
+ok
+
+# Entity interpolation
