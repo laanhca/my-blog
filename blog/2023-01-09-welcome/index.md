@@ -5,4 +5,4 @@ authors: [anh]
 tags: [hello, blog]
 ---
 
-My first blog
+My first post
