@@ -85,5 +85,7 @@ if (buffer.Count >= 2 && buffer[0].timestamp <= renderTimestamp && renderTimesta
     
 }
 ```
-Trong hàm ``Lerp()``: ``t = (renderTimestamp - buffer[0].timestamp)/ (buffer[1].timestamp - buffer[0].timestamp) `` Sau mỗi frame thì thời gian renderTimestamp sẽ dần về bằng thời gian tại vị trí đích. Lúc đó khoảng cách cũng gần hơn, percent sẽ tăng dần về bằng 1.
+Trong hàm ``Lerp()``: ``t = (renderTimestamp - buffer[0].timestamp)/ (buffer[1].timestamp - buffer[0].timestamp) `` Sau mỗi frame thì thời gian renderTimestamp sẽ dần về bằng thời gian tại vị trí đích. Lúc đó khoảng cách cũng gần hơn, percent sẽ tăng dần về bằng 1. <br/>
+<br/>
 Cùng xem thành quả:
+
