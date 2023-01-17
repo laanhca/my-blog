@@ -17,7 +17,7 @@ Khác với game offline một người chơi, multiplayer cần hiển thị c�
 
 Ban đầu mình sử dùng một hàm kiểu như này:
 
-```cs title="SyncViewWithServer()"
+```cs title="void SyncViewWithServer()"
 Vector3 targetPos = state.position; // get last position from server
 var step =  speed * Time.deltaTime; // calculate distance to move per frame
 transform.position = Vector3.MoveTowards(transform.position, targetPos, step);
@@ -43,7 +43,47 @@ Khi Client-1 di chuyển, nhân vật sẽ được di chuyển ngay lập tức
 
 ## Entity interpolation
 
-Sử dụng [Nội Suy](https://en.wikipedia.org/wiki/Linear_interpolation) làm cho chuyển động mượt mà. Còn một cách nữa là sử dụng Ngoại Suy nhưng nó chỉ sử dụng trong một vài trường hợp. <br/>
-Chìa khóa là thay vì hiển thị người chơi khác ngay khi nhận được dữ liệu về vị trí từ Server, bây giờ sẽ hiển thị người chơi khác trong quá khứ.
+Sử dụng [Nội Suy](https://en.wikipedia.org/wiki/Linear_interpolation) làm cho chuyển động mượt mà. Còn một cách nữa là sử dụng Ngoại Suy nhưng nó chỉ sử dụng trong một vài trường hợp.
+<br/>
+Cách làm là thay vì hiển thị người chơi khác ngay khi nhận được dữ liệu về vị trí từ Server, bây giờ sẽ hiển thị người chơi khác trong quá khứ. Ví dụ khi nhận được 2 vị trí tại t = 900 và t = 1000 thì tại t = 1000 đến t =1100, ta hiển thị cho Client-2 thấy những gì xảy ra tại t = 900 đến t = 1000. Nếu người chơi Client-1 tiếp tục di chuyển tại t = 1000 đến t = 1100 thì lúc đó ta đã có dữ liệu vị trí mới để hiển thị tiếp mà không bị khoảng thời gian chết.
+<br/>
+<br/>
+Giải thích bằng lời đôi khi khó hình dung để hiểu, xem code ở bên dưới: 
 
+```cs title="void OnStateChange(List<DataChange> changes)"
+//Lưu lại vị trí từ server khi có dữ liệu mới cùng với thời gian.
+var proxyState = new EntityState
+{
+    position = new Vector3(state.xPos, state.yPos, state.zPos),
+    timestamp = Time.realtimeSinceStartup
+};
 
+proxyStates.Add(proxyState);
+```
+
+```cs title="void SyncView()"
+
+//Delay một khoảng thời gian bằng server time step rồi mới hiển thị.
+float renderTimestamp = Time.realtimeSinceStartup - serverTimeStep / 1000f;
+        
+var buffer = proxyStates;
+
+//Xóa bỏ các vị trí cũ đã hiển thị, chỉ để lại vị trí cuối cùng (vị trí hiện tại)
+while (buffer.Count >= 2 && buffer[1].timestamp <= renderTimestamp )
+{
+    buffer.RemoveAt(0);
+}
+
+//Nội suy từ vị rí hiện tại đến vị trí mới để chuyển động mượt mà, smooth hơn.
+if (buffer.Count >= 2 && buffer[0].timestamp <= renderTimestamp && renderTimestamp <= buffer[1].timestamp)
+{
+    transform.position = Vector3.Lerp(
+        buffer[0].position,
+        buffer[1].position,
+        (renderTimestamp - buffer[0].timestamp)/ (buffer[1].timestamp - buffer[0].timestamp) 
+    );
+    
+}
+```
+Trong hàm ``Lerp()``: ``t = (renderTimestamp - buffer[0].timestamp)/ (buffer[1].timestamp - buffer[0].timestamp) `` Sau mỗi frame thì thời gian renderTimestamp sẽ dần về bằng thời gian tại vị trí đích. Lúc đó khoảng cách cũng gần hơn, percent sẽ tăng dần về bằng 1.
+Cùng xem thành quả:
